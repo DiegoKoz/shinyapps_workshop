@@ -1,0 +1,4 @@
+"0","library(ggridges)"
+"0",""
+"0","ggplot(penguins, aes(x = bill_length_mm, y = species, fill=species)) + "
+"0","  geom_density_ridges()"

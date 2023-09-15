@@ -1,0 +1,33 @@
+{
+    "id": "5E5DB42E",
+    "path": "~/GIT/1_scinet/reading and writing/presentations/internal_seminars/2021-02-09/Why dataviz in R?.Rmd",
+    "project_path": "Why dataviz in R?.Rmd",
+    "type": "r_markdown",
+    "hash": "60680596",
+    "contents": "",
+    "dirty": false,
+    "created": 1612427024322.0,
+    "source_on_save": false,
+    "relative_order": 1,
+    "properties": {
+        "tempName": "Untitled1",
+        "chunk_output_type": "inline",
+        "source_window_id": "",
+        "Source": "Source",
+        "cursorPosition": "122,0",
+        "scrollLine": "110",
+        "rmdVisualMode": "false",
+        "rmdVisualWrapConfigured": "true",
+        "docOutlineVisible": "0",
+        "rmdVisualModeLocation": "920:260",
+        "last_setup_crc32": "BACDFCBCa69f9765"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1612430373,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1612430373613,
+    "read_only": false,
+    "read_only_alternatives": []
+}

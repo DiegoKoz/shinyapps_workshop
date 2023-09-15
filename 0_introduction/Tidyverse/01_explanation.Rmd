@@ -1,0 +1,205 @@
+---
+title: Tidyverse    
+output:
+  html_notebook:
+    toc: yes
+    toc_float: yes
+date: ""
+subtitle: Explanation
+---
+
+This is a brief introduction to the `tidyverse`[__tidyverse__](https://www.tidyverse.org/) so we can stablish a common ground for our Dataviz course. 
+
+The `tidyverse` is a group of packages that have a common logic in their design and are usually used together.
+Within those packages, the most popular are  __dplyr__ and __tidyr__ to transform and reshape our data. __ggplot__ is used for dataviz, and we'll see that on the next session.
+      
+We can load all those packages together
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(palmerpenguins)
+
+```
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+df <- penguins
+```
+
+### Dplyr
+
+In the tidyverse we use a lot the __pipes__ `%>%.
+
+The pipes work like in linux the `|` or in python the `.`. it takes what's on the left, and it makes the transformation with the function on the right. For example:
+
+$f(x,y)$ is equivalent to $x$ %>% $f(.,y)$ 
+
+Let's see some popular functions from _dplyr_:
+
+#### glimpse
+
+We can see an overview of our dataset:
+
+* Number of rows
+* Number of columns
+* Name of columns
+* Data types
+* First few observations
+
+```{r, eval = FALSE}
+glimpse(df)
+```
+
+#### filter
+
+It filters _rows_ following a logic condition
+ 
+```{r}
+df %>% 
+  filter(island == 'Biscoe', flipper_length_mm<180)
+```
+
+When we split the conditions with __,__ we are asking for both conditions at the same time. In case we want _either one of the conditions_, we use __|__
+
+```{r}
+df %>% 
+  filter(island == 'Biscoe'| flipper_length_mm<180)
+```
+
+#### select
+
+Allows to make a subset of columns. We can either specify those we want, or those we do not want (adding a _-_)
+
+```{r}
+c(1,2,3)
+```
+
+```{r}
+df %>% 
+  select(island,species)
+
+df %>% 
+  select(-c(island,species))
+```
+
+#### mutate
+
+With mutate we can create or transform columns, using rowwise operations
+
+```{r}
+
+df %>% 
+  mutate(bill_length_cm = bill_length_mm/10) %>% 
+  select(bill_length_mm,bill_length_cm,year) %>% 
+  mutate(bill_length_cm = bill_length_cm + 100,
+         year = year+10)
+```
+
+#### case_when
+
+
+This allows to assign values following multiple logical conditions
+
+
+
+```{r}
+df$species %>% unique()
+
+df %>% 
+  mutate(first_letter = case_when(species == "Adelie" ~ 'A',
+                                  species == "Gentoo" ~ 'G',
+                                  species == "Chinstrap" ~ 'C',
+                                  TRUE ~ NA_character_)
+         ) %>% 
+  select(species, first_letter)
+```
+
+The `TRUE ~ NA_character_` allows us to classify all other missing cases
+
+
+#### summarise
+
+This creates a new table that aggregates the original data.
+
+
+```{r}
+max(c(1,2,3,5,NA), na.rm = TRUE )
+```
+
+```{r}
+df %>% 
+  filter(island == "Torgersen") %>% 
+  summarise(max_bill_length = max(bill_length_mm,na.rm = T),
+            min_bill_depth = min(bill_depth_mm,na.rm = T))
+```
+
+#### group_by
+
+This can be combined with a summarise (or mutate) to make the operations for each group
+
+```{r}
+df %>% 
+  group_by(island,species,year) %>% 
+  summarise(max_bill_length = max(bill_length_mm,na.rm = T),
+            min_bill_depth = min(bill_depth_mm,na.rm = T))
+
+```
+
+### Joins
+
+Another important functionality are the joins
+
+
+![source: http://rstudio-pubs-static.s3.amazonaws.com/227171_618ebdce0b9d44f3af65700e833593db.html](img/joins.png)         
+
+
+#### left_join    
+
+As a silly example, we could add the previously made dataframe to the original one
+
+```{r}
+summary_data <- df %>% 
+  group_by(island) %>% 
+  summarise(mean_bill_length = mean(bill_length_mm,na.rm = T),
+            mean_bill_depth = mean(bill_depth_mm,na.rm = T))
+
+
+df %>% 
+  left_join(summary_data, by = "island") %>% 
+  select(species,island,bill_length_mm,bill_depth_mm, mean_bill_length,mean_bill_depth)
+```
+
+
+### Tidyr
+
+With this package we will be able to reshape our data in long/wide formats
+
+
+We can use wildcards to define which part of the column names it should take to the new column
+
+
+```{r}
+pv <- penguins %>% 
+  select(-sex, -year) %>%
+  mutate(id = row_number()) %>%
+  pivot_longer(bill_length_mm:body_mass_g, names_to = 'type')
+```
+
+```{r}
+pv %>% 
+  pivot_wider(names_from = 'type',values_from ='value' )
+```
+
+
+```{r}
+penguins %>% 
+  filter(!is.na(sex)) %>%
+  pivot_longer(cols = bill_length_mm:bill_depth_mm, names_pattern =  'bill_(.*)_mm') 
+```
+
+This functions are really complete and useful, so it worth reading the documentation:
+
+https://tidyr.tidyverse.org/reference/pivot_longer.html
+https://tidyr.tidyverse.org/reference/pivot_wider.html
+
+
+
+

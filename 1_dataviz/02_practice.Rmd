@@ -1,0 +1,178 @@
+---
+title: "DataViz"
+subtitle: 'Practice'
+output:
+  html_notebook:
+    toc: yes
+    toc_float: yes
+date: ""
+---
+
+# Guided Practice
+
+For this section, we are going to use a *Rnotebook*, which mix both markdwon formatted text and code. We can easily compile the output as a report in .html format to share with others.
+
+We are going to build some cool visualizations using what we talked in the previous section, and this will be the base for the shiny apps in next section.
+
+First of all, we need to load some libraries.
+
+```{r message=FALSE, warning=FALSE}
+library(tidyverse)
+library(gapminder)
+library(palmerpenguins)
+library(countrycode)
+library(ggrepel)
+library(plotly)
+library(ggthemes)
+library(gridExtra)
+library(scales)
+library(ggridges)
+```
+
+## Penguins
+
+```{r message=FALSE, warning=FALSE}
+penguins %>% 
+  filter(!is.na(sex)) %>% 
+ggplot(., aes(x= bill_length_mm, y = sex, fill=species)) + 
+  geom_density_ridges(alpha=0.5)+
+  theme_minimal()+
+  scale_fill_viridis_d(na.translate = FALSE)+
+  facet_grid(species~.)
+```
+
+```{r message=FALSE}
+penguins %>% 
+  filter(!is.na(sex)) %>% 
+ggplot(., aes(x = bill_length_mm, y = sex,fill = factor(stat(quantile)))) +
+  stat_density_ridges(
+    geom = "density_ridges_gradient", calc_ecdf = TRUE,
+    quantiles = 4, quantile_lines = TRUE,
+    jittered_points = TRUE,
+    position = position_points_jitter(width = 0.05, height = 0),
+    point_shape = '|', point_size = 3, point_alpha = 1) +
+  scale_fill_viridis_d(name = "Quartiles")+
+    theme_minimal()+
+  facet_grid(species~.)+
+  theme(legend.position = 'bottom')
+```
+
+```{r message=FALSE, fig.height=5}
+p1 <- penguins %>% 
+  filter(!is.na(sex)) %>% 
+ggplot(., aes(x = bill_length_mm, y = sex,fill = factor(stat(quantile)))) +
+  stat_density_ridges(
+    geom = "density_ridges_gradient", calc_ecdf = TRUE,
+    quantiles = 4, quantile_lines = TRUE,
+    jittered_points = TRUE,
+    position = position_points_jitter(width = 0.05, height = 0),
+    point_shape = '|', point_size = 3, point_alpha = 1) +
+  scale_fill_viridis_d(name = "Quartiles")+
+    theme_fivethirtyeight()+
+  theme(legend.position = 'none')+
+  labs(title = 'Bill lenght') + 
+  facet_grid(species~.)
+
+p2 <- penguins %>% 
+  filter(!is.na(sex)) %>% 
+ggplot(., aes(x = bill_depth_mm, y = sex,fill = factor(stat(quantile)))) +
+  stat_density_ridges(
+    geom = "density_ridges_gradient", calc_ecdf = TRUE,
+    quantiles = 4, quantile_lines = TRUE,
+    jittered_points = TRUE,
+    position = position_points_jitter(width = 0.05, height = 0),
+    point_shape = '|', point_size = 3, point_alpha = 1) +
+  scale_fill_viridis_d(name = "Quartiles")+
+    theme_fivethirtyeight()+
+  labs(title = 'Bill depth') + 
+  facet_grid(species~.)
+
+
+grid.arrange(p1,p2)
+
+```
+
+or another way would be to use facet_grid
+
+```{r message=FALSE, fig.width=4}
+penguins %>% 
+  filter(!is.na(sex)) %>%
+  pivot_longer(cols = bill_length_mm:bill_depth_mm, names_pattern =  'bill_(.*)_mm') %>% 
+ggplot(., aes(x = value, y = sex,fill = factor(stat(quantile)))) +
+  stat_density_ridges(
+    geom = "density_ridges_gradient", calc_ecdf = TRUE,
+    quantiles = 4, quantile_lines = TRUE,
+    jittered_points = TRUE,
+    position = position_points_jitter(width = 0.05, height = 0),
+    point_shape = '|', point_size = 3, point_alpha = 1) +
+  scale_fill_viridis_d(name = "Quartiles")+
+    theme_hc()+
+  labs(title = 'Bill size') + 
+  facet_grid(species~name, scales = 'free')
+```
+
+## Gapminder
+
+Let's see the [Ratio girls/boys in school, primary and secondary education (%)](https://data.worldbank.org/indicator/SE.ENR.PRSC.FM.ZS)
+
+```{r}
+ratio_girls_education <- read_csv("../data/ratio_of_girls_to_boys_in_primary_and_secondary_education_perc.csv")
+ratio_girls_education
+```
+
+let's clean a little the data before we visualize it
+
+```{r}
+ratio_girls_education <- ratio_girls_education %>% 
+  pivot_longer(cols = -country,values_drop_na = TRUE, names_to = 'year', values_to = 'ratio') %>% 
+    mutate(year = as.integer(year),
+         country = as_factor(country),
+         continent =  countrycode(sourcevar = country,
+                            origin = "country.name",
+                            destination = "continent")) %>% 
+  left_join(gapminder_unfiltered, by = c("country", "year", "continent"))
+```
+
+We can plot one year
+
+```{r}
+ratio_girls_education %>%
+  filter(!is.na(lifeExp)) %>% 
+  filter(year==2007) %>% 
+  ggplot(aes(gdpPercap, ratio, color=continent,size=pop)) +
+  geom_point()+
+  annotate("rect", xmin=0, xmax=5000, ymin=-Inf, ymax=Inf, alpha=0.2, color="blue", fill="blue")+
+  annotate("text", x = 13000, y = 0.7, label = "GDP per capita <5000")+
+  theme_minimal()
+```
+
+```{r message=FALSE, warning=FALSE}
+plt <- ratio_girls_education %>%
+  filter(!is.na(lifeExp)) %>% 
+  filter(year==2007) %>% 
+  ggplot(aes(gdpPercap, ratio, color=continent,size=pop, text = paste(country,
+                                                                      '<br>GDP per capita: ',number(gdpPercap, 1),
+                                                                      '<br>Population: ', number(pop/10000,1),'M',
+                                                                      '<br>ratio: ',ratio))) +
+  geom_point()+
+  scale_y_continuous(labels= percent)+
+  theme_minimal()
+
+
+ggplotly(plt, tooltip = 'text')
+```
+
+# Independent practice
+
+Now design a plot yourselves!
+
+1.  Take a couple of minutes for selecting the dataset
+2.  Try to select an easy dataset (without too much pre-preprossesing), so you can try different visualizations of the data.
+
+You can use any dataset you want, for example:
+
+-   other data from gapminder <https://www.gapminder.org/data/>
+
+-   [tidytuesday](https://github.com/rfordatascience/tidytuesday) is a project for dataviz that post a new dataset every week since 2018.
+
+-   Data from your own research (ideally)

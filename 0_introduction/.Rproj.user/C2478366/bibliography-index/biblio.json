@@ -1,0 +1,27 @@
+{
+    "sources": [
+        {
+            "ISBN": "978-3-319-24277-4",
+            "URL": "https://ggplot2.tidyverse.org",
+            "author": [
+                {
+                    "family": "Wickham",
+                    "given": "Hadley"
+                }
+            ],
+            "id": "ggplot",
+            "issued": {
+                "date-parts": [
+                    [
+                        2016
+                    ]
+                ]
+            },
+            "publisher": "Springer-Verlag New York",
+            "title": "ggplot2: Elegant graphics for data analysis",
+            "title-short": "ggplot2",
+            "type": "book"
+        }
+    ],
+    "project_biblios": []
+}

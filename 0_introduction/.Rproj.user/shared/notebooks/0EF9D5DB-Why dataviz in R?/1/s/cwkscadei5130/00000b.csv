@@ -1,0 +1,11 @@
+"0","library(corrr)"
+"0",""
+"0","penguins %>% "
+"0","  select(bill_length_mm:body_mass_g) %>% "
+"0","correlate(.) %>%"
+"0","  network_plot(.)"
+"2","
+Correlation method: 'pearson'
+Missing treated using: 'pairwise.complete.obs'
+
+"

@@ -1,0 +1,139 @@
+---
+title: "Shiny apps"
+output: 
+  learnr::tutorial:
+    progressive: true
+    allow_skip: true
+runtime: shiny_prerendered
+description: >
+  Learn how to build a shiny app
+---
+
+
+```{r setup, include=FALSE}
+library(learnr)
+library(tidyverse)
+library(gapminder)
+library(palmerpenguins)
+library(countrycode)
+library(shiny)
+library(plotly)
+
+tutorial_options(exercise.timelimit = 60)
+knitr::opts_chunk$set(error = TRUE)
+```
+
+
+## ![](www/shiny_logo.png){width=300}
+
+
+### What is a shiny app?
+
+Shiny is an R package that makes it easy to create interactive web applications directly from R. It allows those not versed in web design to quickly build a reactive page to explore information.
+
+we can see some examples at: 
+<font size="6"> [https://shiny.rstudio.com/gallery/](https://shiny.rstudio.com/gallery/) </font>
+
+
+### Fundamental components of a Shiny app
+
+A Shiny App has two main components
+
+- User Interface (_UI_): Contains the _widgets_ to receive the __input__ from the user and display the __outputs__.
+- Server: Receives the __inputs__ from the UI and with them generates the __outputs__.    
+
+> A widget is a web element that allows the user to send a message.
+
+```{r echo=FALSE, fig.width=7, fig.height=7}
+knitr::include_url('https://shiny.rstudio.com/gallery/widget-gallery.html')
+```
+
+
+## Minimal example. Old Faithful Geyser
+
+Let's start with the most basic example. When we create a new shiny, it generates this example as _template_. 
+
+- First we load the library.
+
+```{r eval=FALSE, include=TRUE}
+library(shiny)
+```
+
+
+- Then we define the user interface. 
+
+## UI elements:
+
+- `fluidPage`: defines the general _layout_ of the page
+- `titlePanel`: For setting the title
+- `sidebarLayout`: It sets up a pre-designed layout of this tab with a sidebar (for the inputs) and a main panel (for the outputs)
+- `sidebarPanel`: here we put all the widgets for the inputs
+- `sliderInput`: In this case, we use a slider input
+- `mainPanel`: here we put all the elements for the main panel
+- `plotOutput`: with this function we indicate that the output is a plot
+
+
+```{r eval=FALSE, include=TRUE}
+ui <- fluidPage(
+  titlePanel("Old Faithful Geyser Data"),
+  sidebarLayout(
+    sidebarPanel(
+      sliderInput(inputId = "bins",
+                  label = "Number of bins:",
+                  min = 1,
+                  max = 50,
+                  value = 30)
+    ),
+    mainPanel(
+      plotOutput("distPlot")
+    )
+  )
+)
+
+```
+
+## Server elements
+
+- `input`: It is a list of elements that we receive from the _ui_. in this case it only contains `bins` (the inputId).
+- `output`: It is a list that we generate inside the server. In this case we define the element `distPlot`.
+- `renderPlot`: It is a _reactive function_, which watches every time the input changes and re-generates the output. Everything that is wrapped between the braces is going to be run each time the `inout$bis` changes
+
+
+```{r, context="server"}
+output$distPlot <- renderPlot({
+  x <- faithful[, 2]  # Old Faithful Geyser data
+  bins <- seq(min(x), max(x), length.out = input$bins + 1)
+  hist(x, breaks = bins, col = 'darkgray', border = 'white')
+})
+```
+
+```{r eval=FALSE, include=TRUE}
+server <- function(input, output) {
+  
+  output$distPlot <- renderPlot({
+    x    <- faithful[, 2]
+    bins <- seq(min(x), max(x), length.out = input$bins + 1)
+    hist(x, breaks = bins, col = 'darkgray', border = 'white')
+  })
+}
+```
+
+## output
+The `shinyApp(ui,server)` binds both elements.
+
+```{r eval=FALSE, include=TRUE}
+shinyApp(ui = ui, server = server)
+```
+
+```{r, echo=FALSE}
+sliderInput("bins", "Number of bins:", min = 1, max = 50, value = 30)
+plotOutput("distPlot")
+```
+
+## Try it yourselves!
+
+You can fin this very same application every time you open a new shiny app.
+
+- go to ![](www/icon_1.png){width=35} --> ![](www/icon_2.png){width=100}
+
+- Run the app with ![](www/run_app.png){width=500}

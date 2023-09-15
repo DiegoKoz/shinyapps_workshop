@@ -1,0 +1,98 @@
+---
+title: Tidyverse
+output:
+  html_notebook:
+    toc: yes
+    toc_float: yes
+date: ""
+subtitle: Guided practice
+---
+
+We are now going to use the library `gapminder` to explore what we learned in the explanation
+
+```{r message=FALSE, warning=FALSE}
+library(tidyverse)
+library(gapminder)
+```
+
+```{r}
+glimpse(gapminder)
+```
+
+### Example 1
+
+> Compute the mean, max and min of the life expectancy in each contient in 2007. Sort data by average life expectancy.
+
+```{r}
+ex_1 <- gapminder %>% 
+  filter(year == 2007) %>% 
+  group_by(continent) %>% 
+  summarise(mean_life_exp = mean(lifeExp),
+            max_life_exp =  max(lifeExp),
+            min_life_exp =  min(lifeExp)) %>% 
+  arrange(mean_life_exp)
+
+ex_1
+```
+
+### Example 2
+
+> Construct a new variable in the dataset containing an estimate of GDP. Estimate the median GDP, and construct another variable that takes value "HIGH" when GDP exceeds that value, and "LOW" when it does not.
+
+
+```{r}
+example_2 <- gapminder %>% 
+  mutate(GDP = pop * gdpPercap)
+
+median_gdp <- median(example_2$GDP)
+
+example_2 <- example_2 %>% 
+  mutate(GDP_level = case_when(GDP > median_gdp ~ "HIGH",
+                               GDP < median_gdp ~ "LOW"))
+
+example_2
+```
+
+### Example 3
+
+> Create a copy of the base where only the variables _country_, _year_ and _lifeExp_ are kept, and rename _lifeExp_ to _life_expectancy_
+
+
+```{r}
+example_3 <- gapminder %>% 
+  select(country, year, life_expectancy=lifeExp) 
+example_3
+```
+
+### Example 4
+
+> Crear una copia de la base donde sólo se conserven las variables _country_, _year_ y _gdpPercap_, and rename the latter to _gdp_per_capita_
+
+```{r}
+example_4 <- gapminder %>% 
+  select(country, year, gdp_per_capita=gdpPercap) 
+
+head(example_4)
+```
+
+### Example 5
+
+> Create a new table containing the data from tables `example_3` and `example_3`. They must be joined according to _country_ and _year_.
+
+Podemos utilizar la función `left_join()`.
+
+```{r}
+example_5 <- left_join(example_3, example_4, by = c("country", "year"))
+
+head(example_5)
+```
+
+### Example 6
+
+> present data from `ex_1` so that the three new variables are presented in vertical format
+
+```{r}
+ex_1 %>%
+  pivot_longer(mean_life_exp:min_life_exp, names_to = 'metric',names_pattern = '(.*)_life_exp')
+```
+

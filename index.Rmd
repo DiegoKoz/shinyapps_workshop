@@ -1,0 +1,79 @@
+---
+title: "Improving the visual interaction with your research: ggplot + Shiny"
+author: "Diego Kozlowski"
+date: "17, 24 and 25 June, 2021"
+output:
+  prettydoc::html_pretty:
+    theme: architect
+    highlight: github
+---
+
+## Agenda
+
+- __room__: MSA 4.500. Belval
+- __dates__: 
+  - 17/06/2021, 09:30-12:30 
+  - 24/06/2021, 25/06/2021, 09:30-18:00
+
+## Introduction
+
+The objective of this workshop is to provide a set of tools that allow a better communication of our research, specially through visual engagement.
+
+This could be useful in a multiple scenarios:
+
+-   For our own understanding of the phenomena, as a good visualization can highlight the underlying patterns on our data
+
+-   For research collaboration, as a way to show intermediate results with other people on our teams
+
+-   For research communication, both for the visualizations within an article, and as a complement in an interactive webpage, that fosters the engagement of the readers with our research.
+
+### ggplot & shiny
+
+There is a multiplicity of language we could use for these goals. Many of them are great, and can deliver similar results to those we are going to see in this workshop. The decision of using **R** is due to its good trade-off between high quality results (both for static visualizations on an article, and interactive plots) and simplicity.
+
+## Contents:
+
+The workshop will be divided in four sections:
+
+0.  **Introduction**
+1.  **Data Viz**
+2.  **Shiny apps**
+3.  **Deployment**
+
+## Prerequisites:
+
+### Istall R + Rstudio: [follow this tutorial](https://learnr-examples.shinyapps.io/ex-setup-r/)
+
+Rstudio should be at least version 1.3. You should see a `tutorial` tab on the right top corner of the IDE.
+
+link to materials:
+
+
+[https://dropit.uni.lu/invitations?share=610c2edf878c7afe31c0&dl=0](https://dropit.uni.lu/invitations?share=610c2edf878c7afe31c0&dl=0)
+
+
+### Dependencies
+
+run the following command on the Rstudio console:
+
+```{r eval=FALSE, include=TRUE}
+install.packages('tidyverse',
+                  'shiny',
+                  'learnr',
+                  'plotly',
+                  'ggrepel',
+                  'ggridges',
+                  'ggthemes',
+                  'gridExtra',
+                  'scales',
+                  'gapminder',
+                  'palmerpenguins',
+                  'countrycode', 
+                  'remotes')
+
+remotes::install_github("paulc91/shinyauthr")
+```
+
+### Bring your data!
+
+In the workshop, there will be space for practice, and you will have the possibility to use your own datasets/results. If you want to do so, remember that the pre-processing usually takes time, so you should try to bring something that is ready to be visualized.

@@ -1,0 +1,168 @@
+---
+title: "Why dataviz in R?"
+output: html_notebook
+bibliography: references.bib
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(gapminder)
+library(palmerpenguins)
+library(countrycode)
+library(ggrepel)
+library(plotly)
+```
+
+Data visualization is a key part of data science. We can use dataviz in two main ways:
+
+1.  **During the research process** Quick sketches, that highlight the internal patterns of data, and help us understand the phenomena.
+2.  **Reporting results** Detailed visualization that help us in the storytelling of our publication.
+
+Also, there are two main type of visualizations:
+
+1.  **Static** For papers, posters, and printed stuff
+2.  **Interactive** For computer-supported materials
+
+So, we need a dataviz language that allows:
+
+1.  Easy sketching
+2.  Detail tailoring as needed
+3.  Good static publication-level visualizations
+4.  Good interactive visualizations.
+
+We could also add:
+
+5.  Easy to understand
+6.  Reusable code
+7.  With a large gamma of options
+8.  With pre-made thematic plots
+
+- *In my personal experience*, the combination ggplot [@ggplot] + plotly [@plotly] + shiny [@shiny] covers all these conditions
+- This that not mean the it is the _only_ or _best_ option for any of the above points, but the one that better handles the trade-off between all.
+- For example, the best known tool for interactive visualizations is neither R nor python, but the [D3 library](https://d3js.org/) for javascript.
+
+
+# GGPLOT
+
+In `ggplot` we think of plots as a succession of layers, which are built one at a time.    
+
+- The __```+```__  operator allows us to add new layers to the plot.
+
+- The ```ggplot()``` command allows us to define the __data source__ and the __variables__ that will determine the axes of the plot (x,y), as well as the color and shape of the lines or points, etc. All the mapped attributes go inside the `aes()` 
+
+- The successive layers allow us to define:
+   
+    - One or more types of graphics (geometries):
+        - ```geom_col()```, 
+        - ```geom_line()```
+        - ```geom_point()```
+        - ```geom_boxplot()```
+    - titles and axis names ```labs()```
+    - plot styling ```theme()```
+    - axis scalses ```scale_y_continuous```,```scale_x_discrete``` 
+    - facetting ```facet_wrap()```,```facet_grid()```
+
+
+for example 
+
+We can make a quick sketch in two lines of code
+
+```{r message=FALSE, warning=FALSE}
+ggplot(penguins, aes(x = flipper_length_mm,y = body_mass_g,color = sex)) +
+  geom_point() 
+```
+But we can also add as much detail as we want
+
+```{r message=FALSE, warning=FALSE}
+plt <- penguins %>% 
+  filter(!is.na(sex)) %>% 
+  ggplot(., aes(x = flipper_length_mm,
+                       y = body_mass_g,
+                       color = sex)) +
+  geom_point() +
+  facet_wrap(~species) +
+  theme_minimal() +
+  scale_color_manual(values = c("darkorange","cyan4")) +
+  labs(title = "Penguin flipper and body mass",
+       subtitle = "Dimensions for male and female Adelie, Chinstrap and Gentoo Penguins at Palmer Station LTER",
+       x = "Flipper length (mm)",
+       y = "Body mass (g)",
+       color = "Penguin sex",
+       shape = 'Island') +
+  theme(legend.position = "bottom",
+        legend.background = element_rect(fill = "white", color = NA),
+        plot.title.position = "plot",
+        plot.caption = element_text(hjust = 0, face= "italic"),
+        plot.caption.position = "plot")
+
+plt
+```
+
+- The pre-defined themes, `theme_*` allows to quicky adjust the style of the plot, while with `theme` let us correct every possible detail. 
+
+## interactivity
+
+-Making this an interactive plot is only one extra line of code
+
+
+```{r, fig.width=10, fig.height=5}
+ggplotly(plt)
+```
+
+
+
+##  [ggplot extensions](https://exts.ggplot2.tidyverse.org/gallery/).
+
+The ggplot library in turn has many other libraries that extend its potential. Among my favorites are:
+
+
+- [gganimate](https://gganimate.com/): for animated plots.
+- [ggridge](https://cran.r-project.org/web/packages/ggridges/vignettes/introduction.html): for faceted density plots
+- [ggally](https://ggobi.github.io/ggally/): for grids of plots and specific visualizations
+- [treemapify](https://cran.r-project.org/web/packages/treemapify/vignettes/introduction-to-treemapify.html) for treemaps
+
+
+for example
+
+```{r message=FALSE, warning=FALSE}
+library(GGally)
+
+penguins %>% 
+  select(species:bill_depth_mm) %>% 
+ggpairs(mapping = aes(color = species))
+```
+
+
+```{r}
+library(ggridges)
+
+ggplot(penguins, aes(x = bill_length_mm, y = species, fill=species)) + 
+  geom_density_ridges()
+```
+
+
+```{r}
+library(corrr)
+
+penguins %>% 
+  select(bill_length_mm:body_mass_g) %>% 
+correlate(.) %>%
+  network_plot(.)
+```
+
+
+- This allows for very specific plot types to be a one-line thing, without loosing the ability of adding our own details later (is not a black-box)
+
+
+
+
+## Shiny
+
+- Shiny is a package that allows to make interactive dashboards, where the user defines the parameters of the plots. 
+
+- For me, this is a great tool in two workflows:
+
+1. As Supporting materials to a paper, to increase the engagement of the readers: i.e. https://ldaglobaltrade.uni.lu/dashboard/
+2. During the project development, to communicate intermediate results with the team: i.e. https://ldaglobaltrade.uni.lu/apps/dev/ (please do not disclose)
+
+---------

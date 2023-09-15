@@ -1,0 +1,5 @@
+"0","library(GGally)"
+"0",""
+"0","penguins %>% "
+"0","  select(species:bill_depth_mm) %>% "
+"0","ggpairs(mapping = aes(color = species))"

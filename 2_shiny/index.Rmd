@@ -1,0 +1,36 @@
+---
+title: "Shiny"
+output: html_document
+---
+
+# Explanation
+
+> Open 01_explanation.Rmd from rstudio and |> run document
+
+# Practice
+
+For the **Guided Practice**, we are going to build two shiny apps:
+
+1.  Palmer Penguins
+2.  Gapminder
+
+Plus, we are going to take a quick look at to very useful topics:
+
+3.  Passwords
+4.  Modules
+
+For the **Independent Practice**, you should:
+
+1.  Take the visualizations you built on the independent practice from the dataviz section
+
+2.  Build a function that wrap the visualization
+
+3.  Add parameters for customization (could be a filtering, choosing a variable, even a type of plot)
+
+4.  Build a shiny app that shows the visualization:
+
+    1.  *Hint:* use a template!
+
+    2.  *Hint*: start by showing the visualization with hardcoded parameters, and later add the interactivity
+
+5.  Customize the app: Add explanations, tables, etc.
